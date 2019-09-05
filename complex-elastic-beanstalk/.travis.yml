@@ -1,14 +1,20 @@
-sudo: required
+sudo: required                                                                        // telling Travis that we need sudo privilege
 services:
-  - docker
+  - docker                                                                            // telling Travis that we need access to the docker client
+  
 
+                                                                                      // install has nothing do to do with the traditional meaning of install
+                                                                                      
 before_install:
-  - docker build -t stephengrider/react-test -f ./client/Dockerfile.dev ./client
+  - docker build -t stephengrider/react-test -f ./client/Dockerfile.dev ./client      //  . means the location of the .travis.yml file
+                                                                                      //  the build context in the above line is ./client
+                                                                                      // ie the client folder a sibling of .travis.yml file
 
 script:
-  - docker run stephengrider/react-test npm test -- --coverage
+  - docker run stephengrider/react-test npm test -- --coverage                        // if this returns with a 0 exit code then after_success will run
+  
 
-after_success:
+after_success:                                                                        // if everything under scripts returns 0 then proceed here
   - docker build -t stephengrider/multi-client ./client
   - docker build -t stephengrider/multi-nginx ./nginx
   - docker build -t stephengrider/multi-server ./server
