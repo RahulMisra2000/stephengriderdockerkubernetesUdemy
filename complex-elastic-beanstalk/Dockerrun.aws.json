@@ -3,10 +3,10 @@
   "containerDefinitions": [
     {
       "name": "client",
-      "image": "stephengrider/multi-client",
+      "image": "stephengrider/multi-client",      # telling AWS to pull this image from Docker Hub
       "hostname": "client",
-      "essential": false,
-      "memory": 128
+      "essential": false,                       
+      "memory": 128                               # how much memory to assign to this container
     },
     {
       "name": "server",
@@ -26,14 +26,14 @@
       "name": "nginx",
       "image": "stephengrider/multi-nginx",
       "hostname": "nginx",
-      "essential": true,
-      "portMappings": [
+      "essential": true,                      # if this container stops/crashes then bring down all the other containers listed in this file
+      "portMappings": [                       # same concept of port mapping as was specified in the docker-compose.yml file
         {
           "hostPort": 80,
           "containerPort": 80
         }
       ],
-      "links": ["client", "server"],
+      "links": ["client", "server"],          # Stephen did not explain this well
       "memory": 128
     }
   ]
