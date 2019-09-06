@@ -45,12 +45,14 @@ after_success:
 deploy:
   provider: elasticbeanstalk                      #  Travis recognizes several pre configured hosting providers
   region: us-west-1                               #  A lot of the info here is coming from the project the author created on AWS Elasticbean
-  app: multi-docker
+  app: multi-docker                               #  This is the AWS ElasticBean application we created on AWS 
   env: MultiDocker-env
-  bucket_name: elasticbeanstalk-us-west-1-306476627547    
+  bucket_name: elasticbeanstalk-us-west-1-306476627547    # This is where Travis will dump the project so AWS gets it
   bucket_path: docker-multi
   on:
-    branch: master
+    branch: master                                # Github will notify Travis when code is pushed to any of its branches
+                                                  # Here we are telling Travis to ONLY deploy when Github tells us that the new code
+                                                  # is in the Master branch of the repo
   access_key_id: $AWS_ACCESS_KEY                  #  these keys we got from AWS Beanstalk and they allow Travis to communicate with it
   secret_access_key:
     secure: $AWS_SECRET_KEY
