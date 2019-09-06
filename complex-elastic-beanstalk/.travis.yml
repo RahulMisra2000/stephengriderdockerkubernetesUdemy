@@ -1,44 +1,56 @@
-sudo: required                                                                        // telling Travis that we need sudo privilege
+sudo: required                                                                        #  telling Travis that we need sudo privilege
 services:
-  - docker                                                                            // telling Travis that we need access to the docker client
+  - docker                                                                            #  telling Travis that we need access to the docker client
   
 
-// install has nothing do to do with the traditional meaning of install **************************************************************
+#  install has nothing do to do with the traditional meaning of install **************************************************************
 before_install:
-  - docker build -t stephengrider/react-test -f ./client/Dockerfile.dev ./client      //  . means the location of the .travis.yml file
-                                                                                      //  the build context in the above line is ./client
-                                                                                      // ie the client folder a sibling of .travis.yml file
+  - docker build -t stephengrider/react-test -f ./client/Dockerfile.dev ./client      #   . means the location of the .travis.yml file
+                                                                                      #   the build context in the above line is ./client
+                                                                                      #  ie the client folder a sibling of .travis.yml file
 
-//***********  In .yml a - means an array of things.... so in the script section below we can have many scripts *******************
-// we have just one ...the docker run ste.... 
-// if ANY SCRIPT returns with a non 0 exit code then Travis considers it a failure and will not run the after_success block
-// ********************************************************************************************************************************* 
+# ***********  In .yml a - means an array of things.... so in the script section below we can have many scripts *******************
+#  we have just one ...the docker run ste.... 
+#  if ANY SCRIPT returns with a non 0 exit code then Travis considers it a failure and will not run the after_success block
+#  ********************************************************************************************************************************* 
 script:
   - docker run stephengrider/react-test npm test -- --coverage                        
   
 
-after_success:                                                            // if everything under scripts returns 0 then proceed here
+
+#  *********** if everything under scripts returns 0 then proceed here. Here we are creating the images for all our application parts
+after_success:                                                        
   - docker build -t stephengrider/multi-client ./client
   - docker build -t stephengrider/multi-nginx ./nginx
   - docker build -t stephengrider/multi-server ./server
   - docker build -t stephengrider/multi-worker ./worker
+  
+#  ********** Now login to docker so we can push the above images to it. So, later AWS elastic beanstalk can pull them down
+#             to deploy them (means to spin up containers with these images)
   # Log in to the docker CLI
+  
+#  The $ variables are variables defined in Travis CI and kept securely there and can be accessed here.
+#  We don't just specify the docker id and pwd here in plain text because remember, this .travis.yml file is sitting in Github
+ amongst our code files.
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-  # Take those images and push them to docker hub
+  
+
+  # ********* Take those images and push them to docker hub
   - docker push stephengrider/multi-client
   - docker push stephengrider/multi-nginx
   - docker push stephengrider/multi-server
   - docker push stephengrider/multi-worker
 
+# ********** Giving AWS Elastic Beanstalk a headsup ************
 deploy:
-  provider: elasticbeanstalk                      // Travis recognizes several pre configured hosting providers
-  region: us-west-1                               // A lot of the info here is coming from the project the author created on AWS Elasticbean
+  provider: elasticbeanstalk                      #  Travis recognizes several pre configured hosting providers
+  region: us-west-1                               #  A lot of the info here is coming from the project the author created on AWS Elasticbean
   app: multi-docker
   env: MultiDocker-env
   bucket_name: elasticbeanstalk-us-west-1-306476627547    
   bucket_path: docker-multi
   on:
     branch: master
-  access_key_id: $AWS_ACCESS_KEY                  // these keys we got from AWS Beanstalk and they allow Travis to communicate with it
+  access_key_id: $AWS_ACCESS_KEY                  #  these keys we got from AWS Beanstalk and they allow Travis to communicate with it
   secret_access_key:
     secure: $AWS_SECRET_KEY
