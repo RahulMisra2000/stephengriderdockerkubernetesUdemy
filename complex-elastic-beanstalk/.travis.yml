@@ -54,3 +54,4 @@ deploy:
   access_key_id: $AWS_ACCESS_KEY                  #  these keys we got from AWS Beanstalk and they allow Travis to communicate with it
   secret_access_key:
     secure: $AWS_SECRET_KEY
+ 
