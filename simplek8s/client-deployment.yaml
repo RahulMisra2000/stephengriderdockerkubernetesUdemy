@@ -1,19 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: client-deployment
+  name: client-deployment         // name of the depployment object
 spec:
-  replicas: 1
+  replicas: 1                     // ****** How many Pods we want
   selector:
     matchLabels:
-      component: web
+      component: web             // ******* The deployment object wants a handle on all the Pods it creates. 
+                                 //         basically, the parent (deployment object) wants to know about its children (the Pods)
+      
+      
+      
+      
+                                  // ****** Below here we are defining the Pod's characteristics ********************************************
   template:
     metadata:
       labels:
-        component: web
+        component: web                                // The Pod(s) will be labelled this
     spec:
-      containers:
-        - name: client
-          image: stephengrider/multi-client
+      containers:                                     // Here we list (array) all the containers inside one Pod, in our example only 1 container
+        - name: client                                
+          image: stephengrider/multi-client           // This image has some program that listens on 3000
           ports:
-            - containerPort: 3000
+            - containerPort: 3000                     // so we expose it. The real exposure in our example is done by a Service/NodePort object defined in another config file
