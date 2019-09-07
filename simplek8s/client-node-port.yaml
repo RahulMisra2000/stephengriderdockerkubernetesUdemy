@@ -1,12 +1,13 @@
 apiVersion: v1
-kind: Service
+kind: Service                         // A service object
 metadata:
   name: client-node-port
 spec:
-  type: NodePort
+  type: NodePort                      // This is a type of Service Object. Think of it as a subtype
   ports:
-    - port: 3050
-      targetPort: 3000
-      nodePort: 31515
-  selector:
+    - port: 3050                      // This is the port that is exposed to allow other objects to connect to any object whose label is component:web
+      targetPort: 3000                // I am not so sure about this, it seems to be the same one specified in the Deployment object
+      nodePort: 31515                 // This is the port that is exposed to allow a browser to connect to any object whose label is component:web
+                                      // I said any object ... but it should be a pod whose container is running maybe a web application eg
+  selector:                           // It will SELECT objects in the cluster whose label is component:web, to do the port-networking specified above
     component: web
