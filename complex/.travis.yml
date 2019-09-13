@@ -45,4 +45,4 @@ deploy:
   script: bash ./deploy.sh                // Inside this script Travis will build all images and push them to Docker Hub and then
                                           // Travis will get kubectl to apply all the config files to the Kubernetes cluster in Google Cloud
   on:
-    branch: master                        // ALL THIS will happen only if the code in the master branch in github was changed
+    branch: master                        // Deployment will happen only if the code in the master branch in github was changed
