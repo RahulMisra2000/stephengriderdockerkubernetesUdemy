@@ -1,16 +1,18 @@
 sudo: required
 services:
-  - docker
+  - docker            // we want access to docker client
 env:
   global:
     - SHA=$(git rev-parse HEAD)
     - CLOUDSDK_CORE_DISABLE_PROMPTS=1
 before_install:
+  // ********* This next line was spewed out by the travis cli when the author encrypted the credential file that he manually created/downloaded from Google Cloud ******
   - openssl aes-256-cbc -K $encrypted_0c35eebf403c_key -iv $encrypted_0c35eebf403c_iv -in service-account.json.enc -out service-account.json -d
-  - curl https://sdk.cloud.google.com | bash > /dev/null;
-  - source $HOME/google-cloud-sdk/path.bash.inc
-  - gcloud components update kubectl
-  - gcloud auth activate-service-account --key-file service-account.json
+  
+  - curl https://sdk.cloud.google.com | bash > /dev/null;                         // *** bring down the google cloud SDK
+  - source $HOME/google-cloud-sdk/path.bash.inc                                   // *** i think this creates the env variables needed
+  - gcloud components update kubectl                                              // *** need kubectl
+  - gcloud auth activate-service-account --key-file service-account.json    
   - gcloud config set project skilful-berm-214822
   - gcloud config set compute/zone us-central1-a
   - gcloud container clusters get-credentials multi-cluster
