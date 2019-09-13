@@ -6,24 +6,43 @@ env:
     - SHA=$(git rev-parse HEAD)
     - CLOUDSDK_CORE_DISABLE_PROMPTS=1
 before_install:
-  // ********* This next line was spewed out by the travis cli when the author encrypted the credential file that he manually created/downloaded from Google Cloud ******
+  // ********* This next line was spewed out by the travis cli when the author encrypted the credential file 
+  //           that he manually created/downloaded from Google Cloud ****************************************************
+  // ********** This next line decrypts the encrypted service-account.json.enc file to service-account.json *************
   - openssl aes-256-cbc -K $encrypted_0c35eebf403c_key -iv $encrypted_0c35eebf403c_iv -in service-account.json.enc -out service-account.json -d
   
   - curl https://sdk.cloud.google.com | bash > /dev/null;                         // *** bring down the google cloud SDK
   - source $HOME/google-cloud-sdk/path.bash.inc                                   // *** i think this creates the env variables needed
   - gcloud components update kubectl                                              // *** need kubectl
+  
+  // ********* gcloud is one of the tools inside the SDK that we downloaded above ****************************************
+  // ********* Next line, gives the SDK authorization the decrypted authentication credentials so that it can connect to my google cloud account
   - gcloud auth activate-service-account --key-file service-account.json    
+  
+  // ********* Telling the SDK which project to use amongst our many different Google Cloud projects
   - gcloud config set project skilful-berm-214822
-  - gcloud config set compute/zone us-central1-a
+  
+  // ********* Telling the SDK which zone to run the Kubernetes cluster in
+    - gcloud config set compute/zone us-central1-a
+    
+  // ********* Telling the SDK the name of the cluser. The cluster in the past was already configured in Google Cloud
   - gcloud container clusters get-credentials multi-cluster
+  
+  // ********* Giving the docker client access to our Docker Hub account
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  
+  // ********* Building an image    -t : name of the image    -f : Dockerfile to use    ./client : this is the build context to use
   - docker build -t stephengrider/react-test -f ./client/Dockerfile.dev ./client
 
+
+// *********** Spin up a container using the above image that was just built and run the npm test command
 script:
   - docker run stephengrider/react-test npm test -- --coverage
 
+// *********** If the container exited with a zero exit code then, proceed below 
 deploy:
   provider: script
-  script: bash ./deploy.sh
+  script: bash ./deploy.sh                // Inside this script Travis will build all images and push them to Docker Hub and then
+                                          // Travis will get kubectl to apply all the config files to the Kubernetes cluster in Google Cloud
   on:
-    branch: master
+    branch: master                        // ALL THIS will happen only if the code in the master branch in github was changed
