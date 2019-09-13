@@ -1,9 +1,10 @@
 sudo: required
 services:
   - docker            // we want access to docker client
-env:
+env:                                                        // *** creating environment variables so that other scripts can access them
   global:
-    - SHA=$(git rev-parse HEAD)
+    - SHA=$(git rev-parse HEAD)                             // ***  this gives the commit id# (this is unique) of the last commit that
+                                                            //      was done.
     - CLOUDSDK_CORE_DISABLE_PROMPTS=1
 before_install:
   // ********* This next line was spewed out by the travis cli when the author encrypted the credential file 
