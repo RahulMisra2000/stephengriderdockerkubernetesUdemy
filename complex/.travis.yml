@@ -41,7 +41,7 @@ script:
 
 // *********** If the container exited with a zero exit code then, proceed below 
 deploy:
-  provider: script
+  provider: script                        // *** deployment will be done by a custom script we write ....    deploy.sh
   script: bash ./deploy.sh                // Inside this script Travis will build all images and push them to Docker Hub and then
                                           // Travis will get kubectl to apply all the config files to the Kubernetes cluster in Google Cloud
   on:
