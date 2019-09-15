@@ -8,7 +8,7 @@ spec:
     name: letsencrypt-prod
     kind: ClusterIssuer
   commonName: k8s-multi.com
-  dnsNames:
+  dnsNames:                               // The certification that will be issued will be good for these two domain names
     - k8s-multi.com
     - www.k8s-multi.com
   acme:
