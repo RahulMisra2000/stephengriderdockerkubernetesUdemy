@@ -4,8 +4,8 @@ metadata:
   name: letsencrypt-prod
 spec:
   acme:
-    server: https://acme-v02.api.letsencrypt.org/directory
-    email: 'ste.grider@gmail.com'
+    server: https://acme-v02.api.letsencrypt.org/directory      /* the address of the issuer with which cert manager will talk */
+    email: 'ste.grider@gmail.com'                               /* give a real email address for some notification, whatever */
     privateKeySecretRef:
-      name: letsencrypt-prod
-    http01: {}
+      name: letsencrypt-prod                                    /* This value letsencrypt sends to us, we just provide here */
+    http01: {}                                                  /* we want to use the http version of getting the certificate */
